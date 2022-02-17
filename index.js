@@ -41,11 +41,14 @@ app.get('/', (req, res) => {
 })
 
 app.get('/article/:slug', (req, res) => {
-	let query =`SELECT * FROM article WHERE slug="${req.params.slug}"`
+//	let query =`SELECT * FROM article b WHERE slug="${req.params.slug}" INNER JOIN author a on b.author_id=a.id`
+	let query = `SELECT *, a.name as art_name, b.name as writer_name FROM article a INNER JOIN author b on a.author_id=b.id WHERE slug="${req.params.slug}";`
 	let article
+	let aname
 	con.query(query, (err, result) => {
 		if(err) throw err;
 		article = result
+//		aname = `SELECT * FROM article b WHERE slug="${req.params.slug}" INNER JOIN author a on b.author_id=a.id`
 		console.log(article)
 		res.render('article', {
 			article: article
