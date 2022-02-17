@@ -16,56 +16,23 @@ app.engine('hbs', hbs.engine({
 
 app.use(express.static('public'))
 
-var con = mysql.createConnection({
+const con = mysql.createConnection({
 	host: "localhost",
 	user: "root",
 	password: "password",
 	database: "joga_mysql"
-})
+});
 
 con.connect(function(err) {
 	if (err) throw err;
 	console.log(`Connected to joga_mysql`)
 })
 
-app.get('/', (req, res) => {
-	let query =`SELECT * FROM article`
-	let articles
-	con.query(query, (err, result) => {
-		if(err) throw err;
-		articles = result
-		res.render('index', {
-			articles: articles
-		})
-	})
-})
+const articleRoutes = require('./routes/article');
+app.use('/', articleRoutes);
+app.use('/article', articleRoutes);
+app.use('/author', articleRoutes);
 
-app.get('/article/:slug', (req, res) => {
-	let query = `SELECT *, a.name as art_name, b.name as writer_name FROM article a INNER JOIN author b on a.author_id=b.id WHERE slug="${req.params.slug}";`
-	let article
-	con.query(query, (err, result) => {
-		if(err) throw err;
-		article = result
-		console.log(article)
-		res.render('article', {
-			article: article
-		})
-	})
-})
-
-app.get('/author/:author_id', (req, res) => {
-	let query = `SELECT *, a.name as art_name, b.name as writer_name FROM article a INNER JOIN author b on a.author_id=b.id WHERE author_id="${req.params.author_id}";`
-	let articles
-	con.query(query, (err, result) => {
-		if(err) throw err;
-		articles = result
-		name = result[0]
-		res.render('author', {
-			articles: articles,
-			name: name
-		})
-	})
-})
 
 app.listen(3000, () => {
 	console.log('App is listening on http://localhost:3000')
